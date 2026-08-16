@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Innovation Hub Lab{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .role-badge {
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                <i class="bi bi-hub"></i> Innovation Hub Lab
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if current_user.is_authenticated %}
+                    <!-- Dashboard - All roles -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    
+                    <!-- Requests - admin, engineer, manager (view only for manager) -->
+                    {% if current_user.role in ['admin', 'engineer', 'manager'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.requests') }}">
+                            <i class="bi bi-card-checklist"></i> Requests
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Import - admin, engineer only -->
+                    {% if current_user.role in ['admin', 'engineer'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.import_data') }}">
+                            <i class="bi bi-download"></i> Import
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Print Jobs - admin, engineer only -->
+                    {% if current_user.role in ['admin', 'engineer'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.print_jobs') }}">
+                            <i class="bi bi-printer"></i> Print Jobs
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Devices - admin, engineer only -->
+                    {% if current_user.role in ['admin', 'engineer'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.devices') }}">
+                            <i class="bi bi-pc-display"></i> Devices
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Reports - admin, manager only -->
+                    {% if current_user.role in ['admin', 'manager'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.reports') }}">
+                            <i class="bi bi-graph-up"></i> Reports
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Settings - admin only -->
+                    {% if current_user.role == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.settings') }}">
+                            <i class="bi bi-gear"></i> Settings
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                            {% if current_user.role == 'admin' %}
+                            <span class="badge bg-danger role-badge">Admin</span>
+                            {% elif current_user.role == 'manager' %}
+                            <span class="badge bg-warning text-dark role-badge">Manager</span>
+                            {% elif current_user.role == 'engineer' %}
+                            <span class="badge bg-info text-dark role-badge">Engineer</span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if current_user.role == 'admin' %}
+                            <li><a class="dropdown-item" href="{{ url_for('main.users') }}">
+                                <i class="bi bi-people"></i> User Management
+                            </a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light py-3 mt-auto">
+        <div class="container text-center">
+            <p class="text-muted mb-0">&copy; 2024 Innovation Hub Lab Management System</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
