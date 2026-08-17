@@ -1,0 +1,533 @@
+================================================================================
+INNOVATION HUB LAB MANAGEMENT SYSTEM - COMPLETE SETUP GUIDE
+================================================================================
+
+This guide will walk you through setting up and running the entire system
+step-by-step on Windows.
+
+================================================================================
+STEP 1: VERIFY PYTHON INSTALLATION
+================================================================================
+
+1. Open PowerShell or Command Prompt
+2. Check Python version:
+   python --version
+   
+   You should see Python 3.11+ (you have 3.14 which is fine)
+
+3. Check pip installation:
+   pip --version
+
+================================================================================
+STEP 2: CREATE REQUIRED DIRECTORIES
+================================================================================
+
+The application needs specific folders to store the database, files, and photos.
+
+In your project folder (E:\innovation\tst-lab-management-system-setup-14750\innovation-hub-lab),
+run these commands in PowerShell:
+
+New-Item -ItemType Directory -Force -Path instance
+New-Item -ItemType Directory -Force -Path data
+New-Item -ItemType Directory -Force -Path storage
+New-Item -ItemType Directory -Force -Path storage\photos
+
+OR manually create these folders:
+- instance
+- data
+- storage
+- storage\photos
+
+================================================================================
+STEP 3: CREATE VIRTUAL ENVIRONMENT (RECOMMENDED)
+================================================================================
+
+A virtual environment keeps dependencies isolated.
+
+1. Create virtual environment:
+   python -m venv venv
+
+2. Activate it:
+   .\venv\Scripts\activate
+
+   You should see (venv) in your command prompt.
+
+================================================================================
+STEP 4: INSTALL DEPENDENCIES
+================================================================================
+
+1. Make sure you're in the project folder:
+   cd E:\innovation\tst-lab-management-system-setup-14750\innovation-hub-lab
+
+2. Install all required packages:
+   pip install -r requirements.txt
+
+   This installs:
+   - Flask
+   - Flask-SQLAlchemy
+   - Flask-Login
+   - openpyxl
+   - requests
+   - APScheduler
+   - python-dotenv
+   - werkzeug
+   - And other dependencies
+
+================================================================================
+STEP 5: CREATE ENVIRONMENT FILE (.env)
+================================================================================
+
+1. Create a file named ".env" in the project root folder
+   (same level as run.py)
+
+2. Add this content to .env:
+
+FLASK_APP=run.py
+FLASK_ENV=development
+SECRET_KEY=your-super-secret-key-change-this-in-production
+DATABASE_URL=sqlite:///instance/app.db
+EXCEL_FILE_PATH=data/responses.xlsx
+ADMIN_DEFAULT_PASSWORD=Admin123!
+PHOTO_RETENTION_DAYS=30
+PHOTO_DELETION_HOUR=2
+ESP_TIMEOUT_SECONDS=10
+ESP_RETRY_COUNT=3
+MAX_CONTENT_LENGTH=16777216
+
+Note: Change SECRET_KEY and ADMIN_DEFAULT_PASSWORD for production!
+
+================================================================================
+STEP 6: INITIALIZE THE DATABASE
+================================================================================
+
+IMPORTANT: Do NOT use "flask db init" (that's for Flask-Migrate which we're not using).
+We use db.create_all() which runs automatically.
+
+1. Just run the app once to create all tables:
+   python run.py
+
+   The first run will:
+   - Create all database tables
+   - Initialize default settings
+   - Create admin user if it doesn't exist
+
+2. You should see:
+   - "Database initialized successfully"
+   - "Admin user created" (if first time)
+   - " * Running on http://127.0.0.1:5000"
+
+3. Press Ctrl+C to stop the server after you see these messages.
+
+================================================================================
+STEP 7: SEED DEMO DATA (OPTIONAL BUT RECOMMENDED)
+================================================================================
+
+This creates sample users, resources, and devices for testing.
+
+1. Run the seed command:
+   flask seed-demo
+
+   This creates:
+   - Admin user (username: admin, password: from .env or "Admin123!")
+   - Engineer user (username: engineer, password: "Engineer123!")
+   - Manager user (username: manager, password: "Manager123!")
+   - Sample workbench resources
+   - Sample tool locker resources
+   - Sample ESP32 devices
+
+================================================================================
+STEP 8: PREPARE SAMPLE EXCEL FILE
+================================================================================
+
+1. Create a sample Excel file at: data/sample_responses.xlsx
+
+2. The Excel file should have these columns (first row = headers):
+   - ID (or Response ID)
+   - Timestamp
+   - Email
+   - Full name
+   - University ID
+   - Phone / WhatsApp
+   - Role
+   - Request type
+   - [Branch-specific columns based on request type]
+
+3. Example request types in the "Request type" column:
+   - workbench
+   - tool_loan
+   - hand_tools
+   - staff_other
+   - complaint
+   - print_job
+
+4. Update your .env if needed:
+   EXCEL_FILE_PATH=data/sample_responses.xlsx
+
+================================================================================
+STEP 9: START THE APPLICATION
+================================================================================
+
+1. Make sure virtual environment is activated:
+   .\venv\Scripts\activate
+
+2. Run the application:
+   python run.py
+
+3. You should see:
+   [2026-XX-XX XX:XX:XX] INFO in __init__: Innovation Hub Lab Management System starting...
+   [2026-XX-XX XX:XX:XX] INFO in __init__: Database initialized successfully
+   [2026-XX-XX XX:XX:XX] INFO in __init__: Starting photo retention scheduler...
+   * Running on http://127.0.0.1:5000
+   * Restarting with stat...
+
+4. Keep this window open - the server is now running!
+
+================================================================================
+STEP 10: ACCESS THE WEB INTERFACE
+================================================================================
+
+1. Open your web browser
+2. Go to: http://localhost:5000
+3. You'll see the login page
+
+4. Login with one of these accounts:
+   
+   ADMIN ACCOUNT:
+   - Username: admin
+   - Password: Admin123! (or what you set in .env)
+   
+   ENGINEER ACCOUNT:
+   - Username: engineer
+   - Password: Engineer123!
+   
+   MANAGER ACCOUNT:
+   - Username: manager
+   - Password: Manager123!
+
+================================================================================
+STEP 11: FIRST-TIME CONFIGURATION
+================================================================================
+
+After logging in as admin:
+
+1. GO TO SETTINGS:
+   - Click "Settings" in the navigation menu
+   - Or go to: http://localhost:5000/admin/settings
+
+2. CONFIGURE EXCEL SETTINGS:
+   - Excel File Path: data/sample_responses.xlsx
+   - Excel Sheet Name: Responses (or your sheet name)
+   - Excel Header Row: 1
+   - Request Type Column: Request type
+   - Request Type Mapping: Leave as default JSON
+
+3. CLICK "SAVE SETTINGS"
+
+================================================================================
+STEP 12: IMPORT YOUR FIRST RESPONSES
+================================================================================
+
+1. Go to "Import" in the navigation menu
+   Or: http://localhost:5000/import
+
+2. Click the big green button: "Fetch New Responses"
+
+3. You'll see a summary:
+   - Rows Found: X
+   - New Imported: Y
+   - Duplicates Skipped: Z
+
+4. Go to "Requests" to see imported requests
+   Or: http://localhost:5000/requests
+
+================================================================================
+STEP 13: TEST KEY FEATURES
+================================================================================
+
+1. VIEW REQUESTS:
+   - Go to Requests
+   - Click on any request to see details
+   - Check branch-specific data (workbench, tool loan, etc.)
+
+2. MANAGE WORKBENCH BOOKINGS:
+   - Go to Workbench
+   - View bookings
+   - Approve/Reject a booking
+   - Assign a resource
+   - Test Check-in/Check-out
+
+3. MANAGE TOOL LOANS:
+   - Go to Tools
+   - View loans
+   - Approve a loan
+   - Checkout tools
+   - Return tools
+
+4. HANDLE COMPLAINTS:
+   - Go to Complaints
+   - View complaint details
+   - Mark as "Viewed"
+   - Add internal notes
+
+5. MANAGE PRINT JOBS:
+   - Go to Print Jobs
+   - View job details
+   - Update status
+   - Complete a job (enter duration)
+   - Upload a photo (test camera on mobile)
+
+6. CONTROL DEVICES (if configured):
+   - Go to Devices
+   - View device details
+   - Send test commands (Enable/Disable/Unlock/Lock)
+   - Check command logs
+
+7. UPLOAD PHOTOS:
+   - On mobile device (must use HTTPS for camera)
+   - Go to a Print Job detail
+   - Click "Add Photo"
+   - Take photo or select from gallery
+   - Choose: Temporary (30 days) or Permanent
+   - Upload
+
+8. VIEW REPORTS:
+   - Go to Reports
+   - View different report types
+   - Test date filters
+   - Export CSV
+
+9. ADMIN DASHBOARD:
+   - Login as admin
+   - Go to Admin Dashboard
+   - View system statistics
+   - Check audit logs
+
+================================================================================
+STEP 14: MOBILE ACCESS (FOR CAMERA FEATURE)
+================================================================================
+
+To use camera on mobile:
+
+OPTION A - Same WiFi Network (Easiest for testing):
+1. Find your computer's IP address:
+   - Run: ipconfig
+   - Look for IPv4 Address (e.g., 192.168.1.100)
+
+2. On mobile, connect to same WiFi
+
+3. On mobile browser, go to:
+   http://192.168.1.100:5000
+
+4. Note: Camera may not work on HTTP. See Option B.
+
+OPTION B - Enable HTTPS (Required for camera):
+1. Generate self-signed certificate:
+   openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+
+2. Run Flask with SSL:
+   flask run --cert=cert.pem --key=key.pem --host=0.0.0.0
+
+3. On mobile, go to:
+   https://192.168.1.100:5000
+
+4. Accept the security warning in your mobile browser
+
+5. Camera will now work!
+
+================================================================================
+STEP 15: ROUTINE OPERATIONS
+================================================================================
+
+DAILY WORKFLOW:
+
+1. Start the server:
+   .\venv\Scripts\activate
+   python run.py
+
+2. Import new responses:
+   - Go to Import page
+   - Click "Fetch New Responses"
+   - Review new requests
+
+3. Process requests:
+   - Workbench: Approve, assign, check-in/out
+   - Tools: Approve, checkout, return
+   - Print Jobs: Queue, print, complete with photo
+   - Complaints: Review, mark viewed, add notes
+
+4. End of day:
+   - Check reports
+   - Review audit logs
+   - Stop server (Ctrl+C)
+
+WEEKLY MAINTENANCE:
+
+1. Backup database:
+   Copy instance/app.db to backup location
+
+2. Backup photos:
+   Copy storage/photos folder
+
+3. Review logs:
+   Check admin dashboard for errors
+
+4. Clean up old data if needed
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+PROBLEM: "unable to open database file"
+SOLUTION: 
+- Make sure 'instance' folder exists
+- Check folder permissions
+- Close any other programs using the database
+
+PROBLEM: "ModuleNotFoundError"
+SOLUTION:
+- Make sure virtual environment is activated
+- Run: pip install -r requirements.txt
+
+PROBLEM: Excel import fails
+SOLUTION:
+- Check EXCEL_FILE_PATH in settings matches actual file location
+- Ensure Excel file is not open in another program
+- Verify column names match expected names
+
+PROBLEM: Camera doesn't work on mobile
+SOLUTION:
+- Must use HTTPS (not HTTP)
+- Generate SSL certificate (see Step 14)
+- Accept security warning in mobile browser
+
+PROBLEM: Device commands fail
+SOLUTION:
+- Check device endpoint URL is correct
+- Verify ESP32 device is online
+- Check timeout settings (increase if needed)
+- Review device command logs for error details
+
+PROBLEM: Photos not uploading
+SOLUTION:
+- Check max file size in settings
+- Verify storage/photos folder exists
+- Check folder write permissions
+
+================================================================================
+IMPORTANT SECURITY NOTES
+================================================================================
+
+1. CHANGE DEFAULT PASSWORDS immediately after first login!
+
+2. For production:
+   - Use strong SECRET_KEY in .env
+   - Enable HTTPS with proper SSL certificate
+   - Don't expose port 5000 directly to internet
+   - Use reverse proxy (Nginx/Apache)
+   - Set FLASK_ENV=production
+
+3. Regular backups:
+   - Database: instance/app.db
+   - Photos: storage/photos
+   - Configuration: .env file
+
+4. User management:
+   - Only create necessary users
+   - Assign minimum required roles
+   - Deactivate unused accounts
+
+================================================================================
+COMMAND REFERENCE
+================================================================================
+
+Start server:
+  .\venv\Scripts\activate
+  python run.py
+
+Stop server:
+  Press Ctrl+C
+
+Create admin user manually:
+  flask seed-admin
+
+Reset database (WARNING: deletes all data):
+  Delete instance/app.db
+  Run: python run.py
+
+View help:
+  flask --help
+
+Check installed packages:
+  pip list
+
+Update packages:
+  pip install --upgrade -r requirements.txt
+
+Deactivate virtual environment:
+  deactivate
+
+================================================================================
+FILE STRUCTURE REFERENCE
+================================================================================
+
+innovation-hub-lab/
+├── app/                      # Main application package
+│   ├── routes/               # URL route handlers
+│   ├── services/             # Business logic services
+│   ├── templates/            # HTML templates
+│   ├── static/               # CSS, JS, images
+│   ├── __init__.py          # App factory
+│   ├── config.py            # Configuration
+│   ├── models.py            # Database models
+│   └── extensions.py        # Flask extensions
+├── instance/                 # SQLite database (created automatically)
+│   └── app.db
+├── data/                     # Excel files
+│   └── responses.xlsx
+├── storage/                  # Uploaded files
+│   └── photos/              # Photo storage
+├── .env                      # Environment variables
+├── requirements.txt          # Python dependencies
+├── run.py                    # Application entry point
+└── README.md                 # Documentation
+
+================================================================================
+SUPPORT & NEXT STEPS
+================================================================================
+
+1. Read the full README.md for detailed documentation
+
+2. Explore each module:
+   - Dashboard overview
+   - Request management
+   - Resource booking
+   - Tool loans
+   - Print jobs
+   - Complaints handling
+   - Device control
+   - Reporting
+
+3. Customize as needed:
+   - Adjust settings in admin panel
+   - Modify email templates (future feature)
+   - Add custom reports
+   - Configure ESP32 endpoints
+
+4. Train your team:
+   - Engineers: Full access to operations
+   - Managers: View reports and complaints
+   - Admins: Full system control
+
+================================================================================
+END OF SETUP GUIDE
+================================================================================
+
+You're now ready to use the Innovation Hub Lab Management System!
+
+For questions or issues, check:
+- Application logs in console output
+- Audit logs in admin dashboard
+- Device command logs for ESP32 issues
+- Error pages for specific error messages
+
+Happy managing!
