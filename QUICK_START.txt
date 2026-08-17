@@ -1,0 +1,45 @@
+================================================================================
+QUICK START - INNOVATION HUB LAB MANAGEMENT SYSTEM
+================================================================================
+
+IF YOU WANT TO GET RUNNING FAST, FOLLOW THESE 5 STEPS:
+
+STEP 1: Create folders
+-----------------------
+In PowerShell (in your project folder):
+    New-Item -ItemType Directory -Force -Path instance,data,storage,storage\photos
+
+STEP 2: Create .env file
+-------------------------
+Create a file named ".env" with this content:
+    FLASK_APP=run.py
+    SECRET_KEY=change-this-to-something-random
+    EXCEL_FILE_PATH=data/responses.xlsx
+    ADMIN_DEFAULT_PASSWORD=Admin123!
+
+STEP 3: Install and setup
+--------------------------
+    python -m venv venv
+    .\venv\Scripts\activate
+    pip install -r requirements.txt
+
+STEP 4: Run the app (creates database automatically)
+-----------------------------------------------------
+    python run.py
+    
+Wait for "Running on http://127.0.0.1:5000"
+Then press Ctrl+C to stop it.
+
+STEP 5: Start again and login
+------------------------------
+    python run.py
+    
+Open browser: http://localhost:5000
+Login: admin / Admin123!
+
+THAT'S IT! You're running!
+
+Next: Go to Settings → Configure Excel path → Import page → Fetch New Responses
+
+For full details, see SETUP_GUIDE.txt
+================================================================================

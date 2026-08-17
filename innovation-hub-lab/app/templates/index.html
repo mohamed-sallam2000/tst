@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Innovation Hub Lab{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <h1 class="display-4 mb-4">
+            <i class="bi bi-hub text-primary"></i> Innovation Hub Lab
+        </h1>
+        <p class="lead mb-4">
+            Welcome to the Innovation Hub Lab Management System.
+            Manage lab resources, track requests, and control ESP32 devices from anywhere.
+        </p>
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title">System Features</h5>
+                <ul class="list-unstyled text-start mx-auto" style="max-width: 400px;">
+                    <li><i class="bi bi-check-circle text-success"></i> Lab Request Management</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Excel Response Import</li>
+                    <li><i class="bi bi-check-circle text-success"></i> ESP32 Device Control</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Complaint Dashboard</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Mobile-Friendly Interface</li>
+                </ul>
+            </div>
+        </div>
+        
+        {% if not current_user.is_authenticated %}
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-box-arrow-in-right"></i> Login
+            </a>
+        </div>
+        {% else %}
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-speedometer2"></i> Go to Dashboard
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

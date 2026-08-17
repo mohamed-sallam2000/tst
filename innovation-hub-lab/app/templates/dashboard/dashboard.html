@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Innovation Hub Lab{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+        <p class="lead">Welcome to the Innovation Hub Lab Management System</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-card-checklist"></i> Requests</h5>
+                <p class="card-text">View and manage lab equipment requests.</p>
+                <a href="{{ url_for('main.requests') }}" class="btn btn-light btn-sm">View Requests</a>
+            </div>
+        </div>
+    </div>
+    
+    {% if current_user.role in ['admin', 'engineer'] %}
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-download"></i> Import</h5>
+                <p class="card-text">Fetch new responses from Excel file.</p>
+                <a href="{{ url_for('main.import_data') }}" class="btn btn-light btn-sm">Import Data</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-pc-display"></i> Devices</h5>
+                <p class="card-text">Control ESP32 devices over HTTPS.</p>
+                <a href="{{ url_for('main.devices') }}" class="btn btn-light btn-sm">Manage Devices</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if current_user.role in ['admin', 'manager'] %}
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-warning text-dark h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-graph-up"></i> Reports</h5>
+                <p class="card-text">View system reports and analytics.</p>
+                <a href="{{ url_for('main.reports') }}" class="btn btn-dark btn-sm">View Reports</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if current_user.role == 'admin' %}
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-danger text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-gear"></i> Settings</h5>
+                <p class="card-text">Configure system settings.</p>
+                <a href="{{ url_for('main.settings') }}" class="btn btn-light btn-sm">Settings</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-secondary text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-people"></i> Users</h5>
+                <p class="card-text">Manage system users.</p>
+                <a href="{{ url_for('main.users') }}" class="btn btn-light btn-sm">User Management</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> 
+            <strong>Your Role:</strong> {{ current_user.role|capitalize }} | 
+            <strong>Logged in as:</strong> {{ current_user.full_name }} ({{ current_user.username }})
+        </div>
+    </div>
+</div>
+{% endblock %}
