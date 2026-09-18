@@ -1,0 +1,31 @@
+[Unit]
+Description=OKX SOL/USDT Spot Trading Bot
+Documentation=https://github.com/your-repo/okx-sol-bot
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tradingbot
+Group=tradingbot
+WorkingDirectory=/opt/okx-sol-bot
+Environment="PATH=/opt/okx-sol-bot/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+EnvironmentFile=/opt/okx-sol-bot/.env
+ExecStart=/opt/okx-sol-bot/venv/bin/python main.py
+Restart=on-failure
+RestartSec=30
+StandardOutput=append:/var/log/okx-sol-bot/bot.log
+StandardError=append:/var/log/okx-sol-bot/bot.error.log
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/okx-sol-bot /var/log/okx-sol-bot
+
+# Resource limits
+MemoryLimit=512M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target
